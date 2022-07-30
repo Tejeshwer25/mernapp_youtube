@@ -1,0 +1,24 @@
+.home {
+  margin: 2rem;
+}
+
+.home_section {
+  margin: 2rem 0rem;
+}
+
+.home_cardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.home_cardContainer * {
+  text-decoration: none;
+  width: max-content;
+}
+
+.home_newsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}

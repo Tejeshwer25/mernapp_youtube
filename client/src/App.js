@@ -1,125 +1,44 @@
-import React from 'react';
-import axios from 'axios';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import "./App.css";
+import Navbar from "./Components/navbar/Navbar";
+import Landing from "./Pages/landing/Landing";
+import Login from "./Pages/login/Login";
+import Register from "./Pages/register/Register";
+import Home from "./Pages/home/Home";
+import UserAccount from "./Pages/userAccount/UserAccount";
 
-import './App.css';
+import UserContextProvider from "./Context/UserContext";
+import Topic from "./Pages/topic/Topic";
 
-class App extends React.Component {
+function App() {
+  return (
+    <Router>
+      <UserContextProvider>
+        <div className="App">
+          <header>
+            <Navbar />
+          </header>
 
-  state = {
-    title: '',
-    body: '',
-    posts: []
-  };
+          <div>
+            <Routes>
+              <Route path="/login" element={<Login />} />
 
-  componentDidMount = () => {
-    this.getBlogPost();
-  };
+              <Route path="/register" element={<Register />} />
 
+              <Route path="/home" element={<Home />} />
 
-  getBlogPost = () => {
-    axios.get('/api')
-      .then((response) => {
-        const data = response.data;
-        this.setState({ posts: data });
-        console.log('Data has been received!!');
-      })
-      .catch(() => {
-        alert('Error retrieving data!!!');
-      });
-  }
+              <Route path="/userAccount" element={<UserAccount />} />
 
-  handleChange = ({ target }) => {
-    const { name, value } = target;
-    this.setState({ [name]: value });
-  };
+              <Route path="/:id" element={<Topic />} />
 
-
-  submit = (event) => {
-    event.preventDefault();
-
-    const payload = {
-      title: this.state.title,
-      body: this.state.body
-    };
-
-
-    axios({
-      url: '/api/save',
-      method: 'POST',
-      data: payload
-    })
-      .then(() => {
-        console.log('Data has been sent to the server');
-        this.resetUserInputs();
-        this.getBlogPost();
-      })
-      .catch(() => {
-        console.log('Internal server error');
-      });;
-  };
-
-  resetUserInputs = () => {
-    this.setState({
-      title: '',
-      body: ''
-    });
-  };
-
-  displayBlogPost = (posts) => {
-
-    if (!posts.length) return null;
-
-
-    return posts.map((post, index) => (
-      <div key={index} className="blog-post__display">
-        <h3>{post.title}</h3>
-        <p>{post.body}</p>
-      </div>
-    ));
-  };
-
-  render() {
-
-    console.log('State: ', this.state);
-
-    //JSX
-    return(
-      <div className="app">
-        <h2>Welcome to the best app ever</h2>
-        <form onSubmit={this.submit}>
-          <div className="form-input">
-            <input 
-              type="text"
-              name="title"
-              placeholder="Title"
-              value={this.state.title}
-              onChange={this.handleChange}
-            />
+              <Route path="/" element={<Landing />} />
+            </Routes>
           </div>
-          <div className="form-input">
-            <textarea
-              placeholder="body"
-              name="body"
-              cols="30"
-              rows="10"
-              value={this.state.body}
-              onChange={this.handleChange}
-            >
-              
-            </textarea>
-          </div>
-
-          <button>Submit</button>
-        </form>
-
-        <div className="blog-">
-          {this.displayBlogPost(this.state.posts)}
         </div>
-      </div>
-    );
-  }
+      </UserContextProvider>
+    </Router>
+  );
 }
-
 
 export default App;

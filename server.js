@@ -1,40 +1,45 @@
-// Import npm packages
-const express = require('express');
-const mongoose = require('mongoose');
-const morgan = require('morgan');
-const path = require('path');
+const path = require("path");
+const dotenv = require("dotenv");
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
+const userRoutes = require("./Routes/userRoutes");
+
+dotenv.config();
+// Express as an app
 const app = express();
-const PORT = process.env.PORT || 8080; // Step 1
 
-const routes = require('./routes/api');
-
-// Step 2
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/mern_youtube', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose is connected!!!!');
-});
-
-// Data parsing
+// middlewares
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-// Step 3
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('client/build'));
+// routes
+app.use("/api/user", userRoutes);
+
+// Serve Frontend
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("frontend/build"));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => res.send("Please use production mode"));
 }
 
-
-// HTTP request logger
-app.use(morgan('tiny'));
-app.use('/api', routes);
-
-
-
-
-app.listen(PORT, console.log(`Server is starting at ${PORT}`));
+// connection to db
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    // listening for requests
+    app.listen(process.env.PORT || 4000, () => {
+      console.log("Server is running on port", process.env.PORT || 4000);
+    });
+  })
+  .catch((error) => console.error(error));
